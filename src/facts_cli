@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+import argparse
+import sys
+import re
+import json
+sys.path.append('../lib')
+
+import cat_fact
+
+def verify_name(name):
+    name_regex = re.compile(r'^[a-zA-Z]+$')
+    if not name_regex.match(name):
+        print "Invalid Name provided"
+        raise argparse.ArgumentTypeError
+        return 0
+    else:
+        print "valid"
+        return name
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-fn", "--firstname",help="Query key facts",type=verify_name)
+parser.add_argument("-ln", "--lastname",help="Query key facts",type=verify_name)
+parser.add_argument("-d", "--delete",help="Delete key facts",action='store_true')
+parser.add_argument("-o", "--output",help="Output key facts",choices=['YAML','JSON'],default="JSON")
+args = parser.parse_args()
+
+if  not args.firstname and not args.lastname:
+    print("Parameter missing , see help --help")
+
+
+'''fact_Obj=cat_fact.CatParse()
+fact_Obj.set_conn_params("https://cat-fact.herokuapp.com/facts")
+facts_selected_data=fact_Obj.get_data()
+fact_Obj.post_server(facts_selected_data)'''
+
+if args.firstname:
+    fact_Obj=cat_fact.CatParse()
+    data=fact_Obj.set_conn_params("http://localhost:80/facts")
+    fname_facts=fact_Obj.get_facts_name(data,fname=args.firstname,)
+    fact_Obj.display_output(fname_facts,args.output)
+
+if args.lastname:
+    fact_Obj=cat_fact.CatParse()
+    data=fact_Obj.set_conn_params("https://cat-fact.herokuapp.com/facts")
+    lname_facts=fact_Obj.get_facts_name(data,lname=args.lastname)
+    fact_obj.display_output(lname_facts,args.output)
+
+if args.delete:
+    if args.firstname or args.lastname:
+        print "Delete facts"
+    else:
+        print "Invalid Choice , Please provide name option"
